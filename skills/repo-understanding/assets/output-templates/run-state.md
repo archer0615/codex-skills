@@ -6,6 +6,7 @@
 | --- | --- |
 | Run ID | <run-id> |
 | Mode | <FULL / INCREMENTAL / RESUME> |
+| Skill version | 2.0.0 |
 | Started revision | <revision> |
 | Last verified revision | <revision> |
 
@@ -26,3 +27,9 @@
 Next Minimal Action: <action>
 
 Pending Gaps: <none or references>
+
+Blocked Items: <none or references>
+
+Scope / Evidence / Artifact inventories: <paths>
+
+Execution log: <path>

@@ -167,7 +167,7 @@ def bootstrap(args: argparse.Namespace) -> int:
 
 def prepare(args: argparse.Namespace) -> int:
     repo = Path(args.repository_path).resolve(); output = Path(args.output_path or repo / "docs" / "repo-understanding").resolve()
-    names = ["index.md", "run-state.md", "gitnexus-coverage.md", "architecture-coverage.md", "diagram-coverage.md", "toolchain-utilization.md"]
+    names = ["index.md", "run-state.md", "gitnexus-coverage.md", "architecture-coverage.md", "diagram-coverage.md", "toolchain-utilization.md", "evidence-inventory.md", "scope-inventory.md", "artifact-inventory.md", "execution-log.md", "pending-gaps.md", "blocked-items.md"]
     template = ROOT / "skills" / SKILL_NAME / "assets" / "output-templates"
     print(f"[prepare] repository: {repo}\n[prepare] output: {output}")
     for name in names:
@@ -194,7 +194,7 @@ def organize(path: Path) -> int:
 
 
 def validate_kb(path: Path) -> int:
-    required = ["index.md", "run-state.md", "gitnexus-coverage.md", "architecture-coverage.md", "diagram-coverage.md", "toolchain-utilization.md"]
+    required = ["index.md", "run-state.md", "gitnexus-coverage.md", "architecture-coverage.md", "diagram-coverage.md", "toolchain-utilization.md", "evidence-inventory.md", "scope-inventory.md", "artifact-inventory.md", "execution-log.md", "pending-gaps.md", "blocked-items.md"]
     if not path.is_dir(): return fail(f"Knowledge base 目錄不存在：{path}")
     missing = [n for n in required if not (path / n).is_file()]
     files = list(path.rglob("*.md"))
@@ -242,6 +242,8 @@ def run_analysis(args: argparse.Namespace) -> int:
     print(f"[run] repository: {repo}\n[run] mode: {args.mode}")
     if prepare(argparse.Namespace(repository_path=repo, output_path=output, apply=args.apply)) != 0: return 1
     if not args.apply: print("[run] 預覽模式：未建立或修改知識庫。"); return 0
+    if args.mode == "FINAL-VERIFY":
+        return 0 if organize(output) == 0 and validate_kb(output) == 0 else 1
     if args.run_gitnexus:
         runner = command_path("gitnexus")
         if not runner: return fail("找不到 GitNexus；無法執行 analyze。")
@@ -258,7 +260,7 @@ def parser() -> argparse.ArgumentParser:
     o = sub.add_parser("organize"); o.add_argument("path")
     k = sub.add_parser("validate-kb"); k.add_argument("path")
     a = sub.add_parser("audit"); a.add_argument("--repository-path", default=str(ROOT)); a.add_argument("--codex-home")
-    r = sub.add_parser("run"); r.add_argument("--repository-path", required=True); r.add_argument("--output-path"); r.add_argument("--mode", choices=["FULL", "INCREMENTAL", "RESUME"], default="FULL"); r.add_argument("--apply", action="store_true"); r.add_argument("--run-gitnexus", action="store_true")
+    r = sub.add_parser("run"); r.add_argument("--repository-path", required=True); r.add_argument("--output-path"); r.add_argument("--mode", choices=["FULL", "INCREMENTAL", "RESUME", "FINAL-VERIFY"], default="FULL"); r.add_argument("--apply", action="store_true"); r.add_argument("--run-gitnexus", action="store_true")
     for kind in ("claude", "cursor"):
         x = sub.add_parser(f"install-{kind}-bridge"); x.add_argument("--home"); x.add_argument("--codex-home"); x.add_argument("--apply", action="store_true"); x.add_argument("--force", action="store_true")
     return p
