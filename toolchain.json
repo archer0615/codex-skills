@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "runtime": {
+    "python": {
+      "minimumVersion": "3.9.0",
+      "purpose": "Cross-platform plugin scripts using only the Python standard library"
+    }
+  },
+  "npm": {
+    "globalPrefixOnUnicodePath": {
+      "windows": "%LOCALAPPDATA%\\npm-global",
+      "posix": "${HOME}/.npm-global"
+    },
+    "projectInstall": "npm ci"
+  },
+  "requiredCapabilities": {
+    "gitnexus": {
+      "kind": "command",
+      "command": "gitnexus",
+      "minimumVersion": "1.6.12",
+      "purpose": "Repository graph, process, route, trace and impact evidence"
+    },
+    "node": {
+      "kind": "command",
+      "command": "node",
+      "minimumVersion": "18.0.0",
+      "purpose": "Node-based runners and target runtime verification"
+    },
+    "npm": {
+      "kind": "command",
+      "command": "npm",
+      "minimumVersion": "9.0.0",
+      "purpose": "Declared Node dependency installation only"
+    },
+    "codebase-onboarding": {
+      "kind": "integrated-capability",
+      "source": "skills/repo-understanding/references/codebase-onboarding.md",
+      "purpose": "Evidence-backed project map, entry points, conventions and first-change guide",
+      "installPolicy": "bundled-no-download"
+    },
+    "archify": {
+      "kind": "codex-skill",
+      "skill": "archify",
+      "purpose": "Validated architecture, workflow, sequence and lifecycle diagrams",
+      "installPolicy": "user-authorized-source-required"
+    }
+  },
+  "bundledSkills": [
+    "repo-understanding"
+  ]
+}

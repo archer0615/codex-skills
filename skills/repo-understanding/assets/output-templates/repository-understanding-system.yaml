@@ -1,0 +1,34 @@
+# Multi-repository system manifest template.
+# Copy to the system root as repository-understanding-system.yaml, then edit.
+# Entries outside the system root require external: true.
+version: 1
+repositories:
+  - id: frontend
+    path: ./frontend
+    role: frontend
+    required: true
+  - id: api
+    path: ./api
+    role: api
+    required: true
+  # - id: nightly-billing
+  #   path: ./nightly-billing
+  #   role: batch-job
+  #   required: false
+  #   triggers:
+  #     - kind: schedule
+  #       cron: "0 2 * * *"
+  #       timezone: Asia/Taipei
+contracts:
+  - id: frontend-to-api
+    kind: http
+    producer: api
+    consumer: frontend
+    evidence: []
+  # - id: batch-to-api
+  #   kind: http
+  #   transport: https
+  #   producer: api
+  #   consumer: nightly-billing
+  #   endpoint: /internal/billing/run
+  #   evidence: []

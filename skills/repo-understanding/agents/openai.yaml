@@ -1,0 +1,6 @@
+interface:
+  display_name: "Repo Understanding"
+  short_description: "Evidence-backed repository knowledge mapping"
+  default_prompt: "Use $repo-understanding to analyze this repository and build its evidence-backed knowledge base."
+policy:
+  allow_implicit_invocation: true

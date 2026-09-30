@@ -1,0 +1,22 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "codex-skills",
+  "version": "1.0.0",
+  "description": "Personal collection of maintainable Codex skills.",
+  "author": {
+    "name": "Personal Codex Skills"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Codex Skills",
+        "shortDescription": "Personal Codex skills",
+        "longDescription": "Maintain and install a personal collection of reusable Codex skills.",
+        "developerName": "Personal Codex Skills",
+        "category": "Developer Tools",
+        "capabilities": ["Skills"],
+        "defaultPrompt": "Use $repo-understanding to analyze this repository and build its evidence-backed knowledge base."
+      }
+    }
+  }
+}
