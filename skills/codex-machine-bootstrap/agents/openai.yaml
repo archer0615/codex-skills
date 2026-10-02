@@ -1,0 +1,5 @@
+interface:
+  display_name: "Codex Machine Bootstrap"
+  short_description: "Initialize and diagnose a local Codex machine"
+  long_description: "Set up reusable user-level Codex guidance, discover local tools and PATH issues, preserve existing settings, and verify a new computer before development work."
+  default_prompt: "Use $codex-machine-bootstrap to preview the local Codex environment, then initialize it only after I explicitly approve the changes."

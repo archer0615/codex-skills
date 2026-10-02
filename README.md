@@ -1,6 +1,6 @@
 # Codex Skills
 
-這是個人使用的 Codex-only、可安裝、可版本化 Skills Plugin。每個 Skill 都以 `skills/<skill-name>/` 作為唯一真實來源；目前內含 `repo-understanding`，Plugin 版本為 `1.0.0`。
+這是個人使用的 Codex-only、可安裝、可版本化 Skills Plugin。每個 Skill 都以 `skills/<skill-name>/` 作為唯一真實來源；目前內含 `repo-understanding` 與 `codex-machine-bootstrap`，Plugin 版本為 `1.0.0`。
 
 使用方式：
 
@@ -36,6 +36,8 @@ codex-skills/
 ```
 
 ## 安裝與更新
+
+給 AI 與維護者的依賴契約、缺少套件時的處理流程與回報格式，請參閱 [docs/AI-USAGE.md](docs/AI-USAGE.md)。每個 Skill 的詳細依賴則放在該 Skill 的 `SKILL.md` 或 `references/`，不可只依賴 README 的簡略說明。
 
 先預覽 bundled Skill 安裝計畫：
 

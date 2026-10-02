@@ -7,6 +7,8 @@ description: "Run evidence-backed repository onboarding for a repository, monore
 
 建立或更新以證據為核心、可續跑的 repository onboarding 知識庫。完整規則在 [Evidence-backed workflow](references/evidence-backed-workflow.md)；本入口只保留路由與安全邊界。所有結論仍以原始碼、設定、測試與可用 runtime 證據為準，GitNexus 僅作 supporting evidence，Archify 只能使用已建檔的證據。
 
+依賴與缺失處理必須遵循 [Dependency Contract](references/dependency-contract.md)。先檢查再分類；缺少能力時不得猜測、偷偷下載或宣稱完成。需要安裝、權限、憑證或外部服務時，回報 `BLOCKED / USER AUTHORIZATION REQUIRED`，取得明確授權後才可修復，並完成 `Identify → Fix → Re-verify`。
+
 支援 `FULL`、`INCREMENTAL`、`RESUME`、`FINAL-VERIFY` 四種模式。每次執行都必須維護 run-state、execution log、scope/evidence/artifact inventory、pending gaps 與 blocked items；開始正式產圖前必須完成 Scope Freeze、Evidence Freeze、Artifact Plan 與 Feature Boundary Review。
 
 此 Skill 不修改 application logic、production、部署資源或 remote Git，不 commit/push/deploy，不自行安裝未知工具；只可更新本 Skill、knowledge base、diagram spec/HTML、verification artifacts、測試與文件。工具失敗必須保留證據並標為 `BLOCKED` 或 `UNKNOWN`，不可當成架構結論。

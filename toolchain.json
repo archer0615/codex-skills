@@ -46,6 +46,7 @@
     }
   },
   "bundledSkills": [
-    "repo-understanding"
+    "repo-understanding",
+    "codex-machine-bootstrap"
   ]
 }
