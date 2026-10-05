@@ -17,7 +17,7 @@ import subprocess
 import sys
 import tempfile
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
@@ -69,10 +69,40 @@ def validate_skill(path: Path) -> int:
     match = re.search(r"(?ms)^---\s*\n(.*?)\n---", content)
     if not match: errors.append("SKILL.md 缺少 YAML frontmatter。")
     else:
-        name = re.search(r"(?m)^name:\s*([a-z0-9-]+)\s*$", match.group(1))
+        frontmatter = match.group(1)
+        name = re.search(r"(?m)^name:\s*([a-z0-9-]+)\s*$", frontmatter)
         if not name: errors.append("frontmatter 缺少合法 name。")
         elif name.group(1) != path.name: errors.append(f"frontmatter name '{name.group(1)}' 與目錄 '{path.name}' 不一致。")
-        if not re.search(r"(?m)^description:\s*.+$", match.group(1)): errors.append("frontmatter 缺少 description。")
+        if not re.search(r"(?m)^description:\s*.+$", frontmatter): errors.append("frontmatter 缺少 description。")
+        version = re.search(r"(?m)^version:\s*['\"]?([0-9]+\.[0-9]+(?:\.[0-9]+)?)['\"]?\s*$", frontmatter)
+        if not version: errors.append("frontmatter 缺少 version（major.minor[.patch]）。")
+        status = re.search(r"(?m)^status:\s*['\"]?(active|experimental|deprecated|retired)['\"]?\s*$", frontmatter)
+        if not status: errors.append("frontmatter 缺少合法 status。")
+        reviewed = re.search(r"(?m)^last_reviewed:\s*['\"]?(\d{4}-\d{2}-\d{2})['\"]?\s*$", frontmatter)
+        if not reviewed:
+            errors.append("frontmatter 缺少 last_reviewed（YYYY-MM-DD）。")
+        else:
+            try: date.fromisoformat(reviewed.group(1))
+            except ValueError: errors.append("frontmatter last_reviewed 不是有效日期。")
+    section_bodies: dict[str, str] = {}
+    for heading in ("Use when", "Inputs", "Procedure", "Decision rules", "Verification", "Output"):
+        section = re.search(r"(?ms)^##\s+" + re.escape(heading) + r"\s*\n(.*?)(?=^##\s+|\Z)", content)
+        if not section:
+            errors.append(f"SKILL.md 缺少必要章節：{heading}")
+        else:
+            section_bodies[heading] = section.group(1).strip()
+            if not section_bodies[heading]: errors.append(f"SKILL.md 必要章節不可為空：{heading}")
+    procedure = section_bodies.get("Procedure", "")
+    if procedure and not re.search(r"(?m)^(?:\d+\.\s+|###\s+\d+\.\s+)", procedure):
+        errors.append("Procedure 至少要包含一個可執行的編號步驟。")
+    example = re.search(r"(?ms)^## Example\s*\n(.*?)(?=^##\s+|\Z)", content)
+    if example and not example.group(1).strip(): errors.append("Example 章節不可為空；請補範例或移除章節。")
+    inputs_match = re.search(r"(?ms)^## Inputs\s*\n(.*?)(?=^## |\Z)", content)
+    if inputs_match:
+        for field in ("Required:", "Optional:", "Preconditions:", "Missing information:", "Output artifact:"):
+            if field not in inputs_match.group(1): errors.append(f"Inputs 缺少欄位：{field}")
+    if status and status.group(1) in {"deprecated", "retired"} and not re.search(r"(?i)migrat|replacement|替代|遷移", content):
+        errors.append("deprecated／retired Skill 必須說明替代或遷移方式。")
     if re.search(r"(?i)\b(?:TODO|FIXME|PLACEHOLDER)\b", content): errors.append("SKILL.md 含未完成 TODO/FIXME/PLACEHOLDER。")
     if metadata.is_file():
         metadata_text = metadata.read_text(encoding="utf-8")
@@ -90,7 +120,7 @@ def validate_skill(path: Path) -> int:
         try: plugin = json.loads(plugin_file.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc: errors.append(f"plugin.json 無效：{exc}"); plugin = {}
         if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", str(plugin.get("name", ""))): errors.append("plugin.json name 必須是 lowercase kebab-case。")
-        if plugin.get("version") != "1.0.0": errors.append("plugin.json version 必須為 1.0.0。")
+        if not re.fullmatch(r"\d+\.\d+\.\d+", str(plugin.get("version", ""))): errors.append("plugin.json version 必須符合 major.minor.patch 格式。")
         if not plugin.get("description"): errors.append("plugin.json 缺少 description。")
     toolchain_file = plugin_root / "toolchain.json"
     if toolchain_file.is_file():
@@ -226,15 +256,29 @@ def bridge(args: argparse.Namespace, kind: str) -> int:
 
 
 def audit(root: Path, home: Optional[str]) -> int:
-    missing = 0; required = 0; ch = codex_home(home); skill = source_skill(root); dest = ch / "skills" / SKILL_NAME
+    missing = 0; ch = codex_home(home); skill = source_skill(root); dest = ch / "skills" / SKILL_NAME
     print(f"[audit] platform: {sys.platform}\n[audit] Codex home: {ch}")
     for label, p in [("plugin.json", root / "plugin.json"), ("toolchain.json", root / "toolchain.json"), ("SKILL.md", skill / "SKILL.md"), ("agents/openai.yaml", skill / "agents" / "openai.yaml")]:
         print(f"[audit] {'PASS' if p.exists() else 'MISSING'} {label} : {p}"); missing += not p.exists()
+    purposes = {
+        "git": "revision / diff / working-tree identity",
+        "node": "Node-based runners such as Archify",
+        "npm": "authorized project dependency installation",
+        "gitnexus": "graph evidence and GitNexus impact gates",
+    }
     for name in ("git", "node", "npm", "gitnexus"):
-        found = command_path(name); print(f"[audit] {'AVAILABLE' if found else 'REQUIRED MISSING'} {name} : {found or 'not found'}"); required += not bool(found)
+        found = command_path(name)
+        state = "AVAILABLE" if found else "OPTIONAL MISSING (gate-dependent)"
+        print(f"[audit] {state} {name} | scope: {purposes[name]} | {found or 'not found'}")
+    archify_candidates = [ch / "skills" / "archify", Path.home() / ".agents" / "skills" / "archify", Path.home() / ".codex" / "skills" / "archify"]
+    archify = next((p for p in archify_candidates if (p / "SKILL.md").is_file() and (p / "bin" / "archify.mjs").is_file()), None)
+    node = command_path("node")
+    archify_state = "AVAILABLE" if archify and node else "OPTIONAL MISSING (diagram gate only)"
+    archify_detail = str(archify) if archify and node else (f"Skill found at {archify}, but Node runner is unavailable" if archify else "not found")
+    print(f"[audit] {archify_state} archify | {archify_detail}")
     print(f"[audit] {'INFO installed Skill exists' if dest.exists() else 'INFO installed Skill not found'} : {dest}")
     if missing: return 1
-    return 2 if required else 0
+    return 0
 
 
 def run_analysis(args: argparse.Namespace) -> int:

@@ -18,32 +18,24 @@ TOOLS = [
     "terraform", "terraform-docs", "gcloud", "kubectl", "docker", "python", "py", "codex",
 ]
 
-GLOBAL_AGENTS = """# Global Codex Environment Instructions
+GLOBAL_AGENTS = """# Local Codex Environment Addendum
 
-## General
+These rules supplement the user's global Codex working instructions. Keep them limited to local environment discovery and do not duplicate cross-project workflow policy.
 
-- 使用繁體中文回覆。
-- 這是本機環境；執行建置、測試、安裝或啟動服務前先檢查環境。
-- 不得因單一命令失敗就判定工具未安裝。
-- 不要自行 commit、push、merge、deploy 或 release。
-- 安裝工具、修改系統 PATH、啟動外部服務或執行雲端操作前，先說明影響並取得確認。
+## Local tool discovery
 
-## Tool discovery
+依序檢查命令解析結果、where/PATH、版本、專案 wrapper 與專案文件。單一 shell 找不到命令時先回報 NOT_FOUND_BY_SHELL，再查 PATH、常見安裝位置或專案 wrapper；不要直接判定工具未安裝。將狀態區分為 FOUND、PATH_ISSUE、MISSING、OPTIONAL、BLOCKED_BY_AUTH。
 
-依序檢查命令解析結果、where/PATH、版本、專案 wrapper 與專案文件。將狀態區分為 FOUND、PATH_ISSUE、MISSING、OPTIONAL、BLOCKED_BY_AUTH。
-
-## Project-aware behavior
+## Local environment boundaries
 
 - 先判斷目前目錄、Git root、專案文件與 lockfile。
 - Node 專案先讀 package.json 與 lockfile。
 - Java 專案先讀 pom.xml、build.gradle、gradle.properties 與 wrapper。
-- Terraform plan/apply 前必須取得確認。
 - 專案自己的 AGENTS.md、README、測試與 wrapper 優先於本規則。
-- 不把專案絕對路徑、憑證、Token、Secret 或固定版本寫入全域設定。
+- 不把憑證、Token 或 Secret 寫入環境盤點檔。
+- 安裝工具、修改系統 PATH、配置憑證或執行雲端操作不屬於診斷；需另行說明影響並取得明確授權。
 
-## Verification
-
-環境修正後重新確認 executable 路徑、版本、依賴、最小建置或測試，以及新 Codex session 是否仍可解析工具。不得宣稱未實際執行的命令成功。
+環境修正後重新確認 executable 路徑、版本、依賴，以及新 Codex session 是否仍可解析工具。不得宣稱未實際執行的命令成功。
 """
 
 CONFIG = """[shell_environment_policy]

@@ -1,0 +1,66 @@
+---
+name: personal-ai-task-router
+version: 1.2
+status: active
+last_reviewed: 2026-10-04
+description: Use to route a personal AI request to the narrowest matching capability.
+---
+
+# Personal Ai Task Router
+
+## Use when
+
+Use this skill when the user asks for capability routing, when multiple materially different workflows are plausible, or when the available skills do not make a clear owner apparent. For ordinary requests with an obvious skill or direct answer, select that skill or answer without invoking this router.
+
+## Inputs
+
+- Required: User request, current repository or conversation context, and applicable project instructions.
+- Optional: Acceptance criteria, preferred output, deadline, risk constraints, or named capabilities.
+- Preconditions: The request can be classified and candidate skills can be inspected.
+- Missing information: Ask only when the gap would materially change the route; otherwise state an assumption.
+- Output artifact: An ordered route with one primary owner, supporting handoffs, and verification criteria.
+
+## Procedure
+
+1. Classify the request as direct, engineering, research, knowledge, composite, or high-impact.
+2. Inspect the request, explicit constraints, acceptance criteria, repository instructions, and available files before choosing a route.
+3. Select the narrowest capability that fully covers the work. Prefer an existing project-specific workflow over a broad or duplicated capability.
+4. If several capabilities are required, order them by dependency: clarify or route first, inspect or research second, execute third, validate last.
+5. If the request is actionable, preserve its intent and proceed. Use requirement refinement only when missing information would materially change the result.
+6. If no capability is an exact match, choose the closest safe workflow, state the assumption, and keep the result reversible.
+7. Hand off the selected route with the objective, relevant context, constraints, expected output, and verification criteria.
+
+## Decision rules
+
+- Use `requirement-refinement` when important requirements, constraints, or acceptance criteria are missing.
+- Use `existing-project-takeover` when the task begins with understanding an unfamiliar existing project.
+- Use `evidence-first-research` when current, niche, external, or source-backed information is required.
+- Use `implementation-validator` after code or configuration changes need targeted verification.
+- Use `quality-gate` before delivery when correctness, compatibility, security, or completeness needs a final review.
+- Use `closed-loop-task-solver` when the work spans inspect, execute, verify, and correction.
+- Do not select a broader composite skill when a narrower skill satisfies the request.
+- If two Skills appear to match, prefer the one with the more specific trigger and primary artifact; use the other only when it owns a distinct dependency or review gate.
+- Use at most one primary execution owner per workstream; supporting Skills must have an explicit input and handoff output.
+- For high-impact, irreversible, external, privacy-sensitive, or security-sensitive work, include governance or human review before execution.
+- When route confidence is low, state the competing candidates and the evidence or clarification needed to choose safely.
+- Own capability selection and sequencing; hand off execution to exactly one primary owner with explicit supporting inputs and return conditions.
+- Do not perform the execution procedure of a selected Skill merely because routing identified it.
+- Do not route every unnamed request through this Skill; use the global working instructions and clear skill descriptions for routine selection.
+
+## Verification
+
+- Confirm the selected capability directly covers the user’s requested outcome.
+- Confirm required dependencies and sequencing are explicit.
+- Confirm the route includes a concrete verification method.
+- Confirm no unsupported status, assumption, or completion claim is introduced.
+- Confirm the handoff specifies the next Skill, its input artifact, expected output, and return condition.
+
+## Output
+
+Return the selected capability or ordered capability sequence, the routing reason, rejected alternatives when material, the key assumptions or missing information, the handoff contract, expected output, and verification method.
+
+## Example
+
+For “compare current providers and recommend one,” route to `evidence-first-research` if current evidence is missing, then `option-comparison`, and use `decision-researcher` only if a separate decision brief is needed.
+
+

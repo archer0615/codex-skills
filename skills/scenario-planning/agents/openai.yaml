@@ -1,0 +1,6 @@
+interface:
+  display_name: "Scenario Planning"
+  short_description: "Use when exploring plausible futures, uncertainty, or decisions that must rem..."
+  default_prompt: "Use the scenario-planning skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

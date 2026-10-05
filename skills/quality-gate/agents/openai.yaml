@@ -1,0 +1,6 @@
+interface:
+  display_name: "Quality Gate"
+  short_description: "Use when reviewing whether an artifact or change is ready to deliver."
+  default_prompt: "Use the quality-gate skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

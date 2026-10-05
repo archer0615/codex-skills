@@ -1,0 +1,6 @@
+interface:
+  display_name: "Knowledge Base Organizing"
+  short_description: "Use when organizing scattered notes, documents, or links into a searchable an..."
+  default_prompt: "Use the knowledge-base-organizing skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

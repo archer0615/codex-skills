@@ -1,0 +1,6 @@
+interface:
+  display_name: "Existing Project Takeover"
+  short_description: "Use when taking over an unfamiliar repository or codebase."
+  default_prompt: "Use the existing-project-takeover skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

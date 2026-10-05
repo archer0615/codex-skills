@@ -1,0 +1,6 @@
+interface:
+  display_name: "Evidence First Research"
+  short_description: "Use for research requiring current, traceable, source-backed conclusions."
+  default_prompt: "Use the evidence-first-research skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,60 @@
+---
+name: implementation-validator
+version: 1.1
+status: active
+last_reviewed: 2026-08-24
+description: Use after implementation to run targeted checks and report evidence.
+---
+
+# Implementation Validator
+
+## Use when
+
+Use this skill after implementation or configuration changes when targeted evidence is needed to determine whether the requested behavior works and whether regressions were introduced. Use the relevant project's existing test and verification conventions; this skill does not itself authorize adding or running tests.
+
+## Inputs
+
+- Required: Final changed state, acceptance criteria, project instructions, and available test or build commands.
+- Optional: Baseline results, affected paths, risk assessment, and environment limitations.
+- Preconditions: Implementation is complete enough to validate and final files are accessible.
+- Missing information: Mark unavailable checks as unverified; do not infer success from inspection alone.
+- Output artifact: Validation report with commands, evidence, acceptance mapping, failures, limitations, and readiness.
+
+## Procedure
+
+1. Read the request, acceptance criteria, changed files, project instructions, and available test or build configuration.
+2. Inspect the diff and identify the changed execution paths, risk areas, and the smallest checks that cover them.
+3. Choose checks from project instructions, user authorization, change risk, and available capabilities. When permitted and useful, run checks in increasing cost and scope: static or syntax checks, targeted tests, affected package checks, then broader checks only when justified. If tests are not authorized, unavailable, or inappropriate, use another relevant check and mark behavior that remains unproven as unverified.
+4. Capture the exact command, result, relevant failure output, and environment limitation for every check.
+5. Compare results with the acceptance criteria and, when available, the pre-change baseline. Classify findings as pass, introduced failure, pre-existing failure, warning, or unverified.
+6. If an introduced failure is found, provide the cause and return the work to the implementation or correction loop. Do not silently modify scope to make a check pass.
+7. Classify validation depth as `smoke`, `targeted`, `affected-area`, or `full`; explain why the selected depth is sufficient and what remains outside coverage.
+
+## Decision rules
+
+- Prefer existing project commands and test conventions over invented validation scripts.
+- A testing method such as test-first development is an optional implementation technique, not a universal gate. Follow it when requested or supported by project instructions and task context; do not delay a clear task to add tests when that is not authorized.
+- Match validation depth to change risk: behavior, public API, data, security, and build changes require broader evidence.
+- Do not treat a successful lint or static check as proof of runtime behavior.
+- Do not report a check as passed when it was skipped, blocked, or only inferred.
+- Keep secrets, credentials, private data, and machine-specific paths out of evidence.
+- Prefer a baseline comparison whenever the repository or prior artifact is available.
+- Treat a blocked dependency, unavailable environment, or skipped test as `unverified`, not `pass`.
+- Own technical execution checks and evidence; hand final evidence, limitations, and unresolved risks to `quality-gate` for delivery readiness.
+- Escalate from targeted to broader checks when the change affects public contracts, data, security, or multiple execution paths.
+
+## Verification
+
+- Every acceptance criterion has a corresponding check or an explicit unverified status.
+- The final check ran against the final modified state.
+- Failures identify whether they were introduced, pre-existing, or caused by the environment.
+- The report distinguishes verified behavior from limitations and recommendations.
+- Validation depth, baseline, coverage boundary, and failure classification are explicit.
+
+## Output
+
+Return a validation report with scope, changed paths, commands run, results, acceptance-criteria mapping, failures or limitations, and a clear ready/not-ready recommendation.
+
+## Example
+
+For a one-file configuration change, run a syntax or targeted check first. If it changes a public API or data path, expand to affected-area or full validation and compare with the baseline; report any unavailable environment as unverified.

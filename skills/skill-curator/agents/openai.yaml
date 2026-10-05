@@ -1,0 +1,6 @@
+interface:
+  display_name: "Skill Curator"
+  short_description: "Use to review, deduplicate, and maintain a skill library."
+  default_prompt: "Use the skill-curator skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

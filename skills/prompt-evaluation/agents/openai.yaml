@@ -1,0 +1,6 @@
+interface:
+  display_name: "Prompt Evaluation"
+  short_description: "Use when testing whether a prompt is clear, robust, consistent, and fit for r..."
+  default_prompt: "Use the prompt-evaluation skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

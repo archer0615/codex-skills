@@ -1,6 +1,9 @@
 ---
 name: repo-understanding
-description: "Run evidence-backed repository onboarding for a repository, monorepo, or explicitly scoped multi-repository system, including GitNexus reconciliation, API/flow tracing, Archify diagrams, resumable knowledge-base artifacts, and final verification."
+version: 1.2
+status: active
+last_reviewed: 2026-10-05
+description: "Use for evidence-backed, resumable onboarding of a repository, monorepo, or explicitly scoped multi-repository system; select GitNexus evidence and Archify diagrams only when the accepted scope needs them."
 ---
 
 # Repo Understanding
@@ -13,13 +16,25 @@ description: "Run evidence-backed repository onboarding for a repository, monore
 
 此 Skill 不修改 application logic、production、部署資源或 remote Git，不 commit/push/deploy，不自行安裝未知工具；只可更新本 Skill、knowledge base、diagram spec/HTML、verification artifacts、測試與文件。工具失敗必須保留證據並標為 `BLOCKED` 或 `UNKNOWN`，不可當成架構結論。
 
-## Start
+## Use when
+
+Use this skill when the user requests an evidence-backed, resumable understanding of a repository, monorepo, or explicitly scoped multi-repository system. For a short first-pass takeover brief, use `existing-project-takeover` instead.
+
+## Inputs
+
+- Required: Target repository or system root, requested analysis scope, and applicable repository instructions.
+- Optional: Existing knowledge base, repository-system manifest, known workflows, diagram needs, and available verification tools.
+- Preconditions: Target files can be read; repository identity and dirty changes can be inspected without overwriting user work.
+- Missing information: Use bounded inspection for a single repository; ask the user to confirm candidate repositories and contracts before treating them as one multi-repository system.
+- Output artifact: Resumable knowledge base with scope, evidence, architecture and workflow documentation, coverage, verification state, gaps, and next actions.
+
+## Procedure
 
 1. 讀取 repository 的 `AGENTS.md` 與其他既有開發規則。
 2. 先執行 [Environment preflight](#environment-preflight)；若 target 有初始化／稽核腳本，依平台選擇並記錄結果，不要直接猜測工具是否可用。
-3. 依 [System scope](references/system-scope.md) 與 [Bootstrap](references/bootstrap.md) 偵測單一 repository、monorepo 或多 repository system scope；沒有 manifest 時，multi-repository candidates 必須先由使用者確認。逐 repository 檢查 Git 狀態、GitNexus、整合的 Codebase Onboarding 能力與 index 新鮮度，並依 [GitNexus coverage](references/gitnexus-coverage.md) 建立 Capability Profile。執行 onboarding 時必讀 [Codebase Onboarding integration](references/codebase-onboarding.md)。
+3. 依 [System scope](references/system-scope.md) 與 [Bootstrap](references/bootstrap.md) 偵測單一 repository、monorepo 或多 repository system scope；沒有 manifest 時，multi-repository candidates 必須先由使用者確認。逐 repository 檢查 Git 狀態、整合的 Codebase Onboarding 能力及可用的 GitNexus/index；缺少 GitNexus 不停止 source-based 分析。依 [GitNexus coverage](references/gitnexus-coverage.md) 建立 Capability Profile。執行 onboarding 時必讀 [Codebase Onboarding integration](references/codebase-onboarding.md)。
 4. 依 [Resume and checkpoint](references/resume-and-checkpoint.md) 讀取既有工作狀態並選擇 `RESUME`、`FULL`、`INCREMENTAL` 或 `FINAL-VERIFY`。首次執行、缺少可信 baseline/index 或影響範圍不安全時使用 FULL；FINAL-VERIFY 不重新分析，只驗證既有產物。
-5. 依 [Execution gates](references/execution-gates.md) 判定每個工具／Skill 是否值得執行，再依 [Autonomous loop](references/autonomous-loop.md) 建 index、蒐集證據、產出文件／圖表並執行 gate。
+5. 依 [Execution gates](references/execution-gates.md) 判定每個工具／Skill 是否值得執行，再依 [Autonomous loop](references/autonomous-loop.md) 視適用性建立或更新 index、蒐集證據、產出文件／圖表並執行 gate。
 6. 依 [Knowledge base](references/knowledge-base.md) 記錄產物、覆蓋率、證據與新鮮度；產圖前必讀 [Diagram coverage](references/diagram-coverage.md)，以 scope inventory 決定同類型圖表數量。若 target 沒有既有文件格式，可從 `assets/output-templates/` 複製需要的骨架；不可覆寫既有文件或將範本內容當成證據。
 
 ## Deterministic helpers
@@ -50,15 +65,15 @@ Preflight 必須記錄：
 - Skill 引用的 references 與 assets 是否存在
 - `CODEX_HOME` 或預設 Codex 目錄
 - Skill 是否已安裝、是否為相同版本
-- Git、Node、npm、GitNexus runner 是否可用
-- 內建 Codebase Onboarding 整合與 Archify 是否已存在
+- Git、Node、npm、GitNexus runner 是否可用，以及各自關聯 gate 是否在本次 scope
+- 內建 Codebase Onboarding 整合是否存在；只有圖表 gate 適用時才檢查 Archify runner
 - 是否有 package.json／lockfile 可供專案依賴驗證
 
 AI 必須將結果分類：
 
 | Status | Meaning | Action |
 | --- | --- | --- |
-| `READY` | 必要來源與 Skill 已就緒 | 繼續 Bootstrap |
+| `READY` | 本次 scope 的必要來源與能力已就緒 | 繼續適用的工作 gate |
 | `NEEDS INITIALIZATION` | Skill 尚未安裝或版本不同 | 先提供 init 預覽，等待 `--apply` 授權 |
 | `OPTIONAL MISSING` | 可選工具缺少 | 記錄影響，不自行下載 |
 | `BLOCKED / USER AUTHORIZATION REQUIRED` | 需要安裝、權限、憑證或外部狀態 | 停止受影響 gate，明確回報 |
@@ -69,12 +84,29 @@ AI 必須將結果分類：
 
 ## Tool routing
 
-- GitNexus：依 `gitnexus-coverage.md` 完成 index reconciliation、clusters、processes、routes、context、trace、impact、detect_changes；只在適用時使用 PDG。
+- GitNexus：只有在明確問題需要 graph supporting evidence，或可信 diff 需要影響分析時，依 `gitnexus-coverage.md` 執行最小適用查詢；只在適用時使用 PDG。工具缺失或不會補足 material gap 時記錄 `SKIP`／`OPTIONAL MISSING`，以 source/config/test/runtime 為主，不因此阻擋其他 gate。
 - `codebase-onboarding`：使用本 Skill 內建的整合契約，從已驗證證據建立專案地圖、入口、慣例與 first-change guide；不得另建第二個 Skill 或獨立 wiki 事實來源。
-- Archify：僅將已確認的元件、流程、資料邊界或狀態轉為 architecture、workflow、sequence、dataflow、lifecycle 圖；同類型的獨立 scope 必須產出不同 artifact。
+- Archify：只在使用者要求圖表，或已確認的 scope／驗收需要圖表時，將證據轉為 architecture、workflow、sequence、dataflow、lifecycle 圖；同類型的獨立 scope 必須產出不同 artifact。沒有圖表需求時標記 `NOT APPLICABLE`，不可為了使用工具而產圖。
 
-完整分析的 required capabilities 是 target／toolchain 宣告的 GitNexus、Node、npm、內建 Codebase Onboarding 與 Archify。能力 profile 必須逐 repository 記錄 index revision、parsed file count、symbol/flow count、index/context/routes/processes/trace/impact/detect_changes、FTS/VECTOR/PDG、Terraform/HCL parser、排除範圍、失敗原因與 source fallback。Windows native extension、code page、FTS/VECTOR 失敗時只有限次相容模式嘗試，之後保留錯誤並改用 graph/source/config/test。
+能力是否必要由使用者要求的 scope 和適用 gate 決定，不得把 `toolchain.json` 中宣告的所有工具都當成每次執行的前置條件。能力 profile 對適用工具記錄 index revision、parsed file count、symbol/flow count、index/context/routes/processes/trace/impact/detect_changes、FTS/VECTOR/PDG、Terraform/HCL parser、排除範圍、失敗原因與 source fallback；不適用的工具記錄 `NOT APPLICABLE`。Windows native extension、code page、FTS/VECTOR 失敗時只有限次相容模式嘗試，之後保留錯誤並改用 source/config/test。內建 Codebase Onboarding 不需要額外下載；若明確要求的 gate 需要 GitNexus、Node、npm 或 Archify 而沒有可用能力，僅阻擋該 gate；若將下載或安裝工具，回報 `BLOCKED / USER AUTHORIZATION REQUIRED`。不要將工具缺失誤報為架構結論，也不要臆造未驗證的套件來源或安裝命令。
 
-完整分析的 required capabilities 是 target／toolchain 宣告的 GitNexus、Node、npm、內建 Codebase Onboarding 與 Archify。內建 Codebase Onboarding 不需要額外下載；若 GitNexus、Node、npm 或 Archify 未就緒，先確認是否已有可用替代 runner；若執行將導致下載或安裝，回報 `BLOCKED / USER AUTHORIZATION REQUIRED` 並停止受影響 gate。不要將工具缺失誤報為 repository 的架構結論，也不要臆造未驗證的套件來源或安裝命令。
+最終回報模式、revision／影響範圍、產物位置、適用 gate 結果、必要 capabilities、STALE 數量及 BLOCKED 項目。若使用者要求的 scope 均已完成且所有適用必要 gate 通過，即可標記 `DONE`；可選工具缺失或 `NOT APPLICABLE` gate 不會單獨阻止完成。明確要求的 gate 未完成時，回報 `PARTIAL` 或該 gate 的 `BLOCKED`。
 
-最終回報模式、revision／影響範圍、產物位置、各 gate 結果、required capabilities、STALE 數量及 BLOCKED 項目。只有所有適用 required capabilities 已 READY，且達到 reference 定義的 DONE 條件時才宣告完整完成；否則回報 PARTIAL 或 BLOCKED。
+## Decision rules
+
+- Use FULL for first analysis or when no trustworthy baseline/index exists; use RESUME or INCREMENTAL only when saved state and repository revision support it; FINAL-VERIFY checks existing artifacts without re-analysis.
+- Treat target repository instructions and source/config/test evidence as authoritative; GitNexus is supporting evidence.
+- Do not infer a multi-repository system from sibling directories; obtain confirmation for candidate repositories and contracts.
+- Do not install tools, overwrite existing knowledge, modify application logic, or perform remote/destructive actions as part of this Skill.
+- Missing capabilities affect only the gate that needs them; use `SKIP`／`NOT APPLICABLE` for out-of-scope tools, and `PARTIAL`／`BLOCKED` only when an applicable acceptance gate remains unmet.
+
+## Verification
+
+- Every material architecture or workflow claim has primary evidence, with graph evidence clearly marked as supporting.
+- Scope, capability profile, artifact coverage, revision freshness, pending gaps, and blocked items are recorded.
+- The repository's knowledge-base validator and other applicable final checks run after the last artifact update.
+- DONE is reported when the accepted scope and every applicable required acceptance gate are complete; unused optional tools do not block it.
+
+## Output
+
+Return the selected mode, repository and revision scope, artifacts created or updated, gate and capability results, verification evidence, stale count, unresolved gaps, blocked items, and next action.

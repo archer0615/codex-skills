@@ -1,0 +1,6 @@
+interface:
+  display_name: "Sop Generator"
+  short_description: "Use when turning a repeatable task or informal know-how into a clear, handoff..."
+  default_prompt: "Use the sop-generator skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

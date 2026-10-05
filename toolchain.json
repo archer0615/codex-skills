@@ -18,35 +18,67 @@
       "kind": "command",
       "command": "gitnexus",
       "minimumVersion": "1.6.12",
-      "purpose": "Repository graph, process, route, trace and impact evidence"
+      "purpose": "Supporting repository graph, process, route, trace and impact evidence when it answers a material question or an accepted gate requires it",
+      "appliesWhen": "An accepted scope requires graph supporting evidence or GitNexus-based change-impact analysis"
     },
     "node": {
       "kind": "command",
       "command": "node",
       "minimumVersion": "18.0.0",
-      "purpose": "Node-based runners and target runtime verification"
+      "purpose": "Node-based runners and target runtime verification",
+      "appliesWhen": "A selected and authorized gate needs a Node-based runner"
     },
     "npm": {
       "kind": "command",
       "command": "npm",
       "minimumVersion": "9.0.0",
-      "purpose": "Declared Node dependency installation only"
+      "purpose": "Declared Node dependency installation only",
+      "appliesWhen": "The user requests dependency installation and the target declares a compatible lockfile"
     },
     "codebase-onboarding": {
       "kind": "integrated-capability",
       "source": "skills/repo-understanding/references/codebase-onboarding.md",
       "purpose": "Evidence-backed project map, entry points, conventions and first-change guide",
+      "appliesWhen": "Repository-understanding work is in scope",
       "installPolicy": "bundled-no-download"
     },
     "archify": {
       "kind": "codex-skill",
       "skill": "archify",
       "purpose": "Validated architecture, workflow, sequence and lifecycle diagrams",
+      "appliesWhen": "The user requests diagrams or accepted scope and evidence make a diagram a required deliverable",
       "installPolicy": "user-authorized-source-required"
     }
   },
+  "capabilityApplicabilityPolicy": "Task-scoped: a capability is required only when its matching accepted gate is in scope; unused optional capabilities do not block completion.",
   "bundledSkills": [
+    "ai-governance",
+    "ai-playbook-maintainer",
+    "closed-loop-task-solver",
+    "codex-machine-bootstrap",
+    "codex-project-bootstrap",
+    "context-management",
+    "conversation-skill-miner",
+    "decision-researcher",
+    "evidence-first-research",
+    "existing-project-takeover",
+    "human-review-workflow",
+    "implementation-validator",
+    "knowledge-base-organizing",
+    "option-comparison",
+    "personal-ai-task-router",
+    "project-tracking",
+    "prompt-curator",
+    "prompt-evaluation",
+    "prompt-skill-publisher",
+    "quality-gate",
     "repo-understanding",
-    "codex-machine-bootstrap"
+    "requirement-refinement",
+    "scenario-planning",
+    "skill-curator",
+    "sop-generator",
+    "security-review",
+    "react-performance-review",
+    "web-interface-review"
   ]
 }

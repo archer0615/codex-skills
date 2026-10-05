@@ -1,0 +1,6 @@
+interface:
+  display_name: "Prompt Skill Publisher"
+  short_description: "Use to turn an approved prompt or skill into a validated published artifact."
+  default_prompt: "Use the prompt-skill-publisher skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0
+
+- 將 GitNexus、Node、npm 與 Archify 改為依接受範圍和 gate 條件判斷，不再由工具缺失一律阻擋整份分析。
+- 明確區分 source-based knowledge work、graph supporting evidence、Node runner、專案依賴安裝與 diagram gate。
+
 ## 2.0.0
 
 - 從基本掃描升級為 evidence-backed、可續跑的 onboarding workflow。

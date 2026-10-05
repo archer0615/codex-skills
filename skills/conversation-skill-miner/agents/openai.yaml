@@ -1,0 +1,6 @@
+interface:
+  display_name: "Conversation Skill Miner"
+  short_description: "Use to extract reusable procedures or skills from a conversation."
+  default_prompt: "Use the conversation-skill-miner skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

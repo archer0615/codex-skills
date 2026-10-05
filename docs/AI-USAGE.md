@@ -44,12 +44,17 @@ AI 必須先讀取該 Skill 的 `SKILL.md`，再依其中列出的 references、
 
 ## 本 Plugin 目前的依賴
 
-- Python 3.9+：執行跨平台初始化與驗證腳本，屬必要 runtime。
-- GitNexus 1.6.12+：完整 repository graph 與 flow evidence，屬完整分析的必要能力。
-- Node 18+：Node runner 與目標 runtime verification。
-- npm 9+：只執行已宣告的 project dependency install。
+`toolchain.json` 的 `requiredCapabilities` 是 task-scoped gate 能力清單；依賴名稱列在此處，不代表所有工作都需要安裝或執行它們。
+
+- Python 3.9+：只在執行本 Plugin 的初始化／驗證腳本時需要。
+- Git：在需要 revision、diff 或工作樹身分時需要；沒有 Git 時改標相關證據未驗證，source inspection 可繼續。
+- GitNexus 1.6.12+：只有 graph supporting evidence 或 GitNexus impact gate 符合使用條件時需要；source-based onboarding 不會因此自動阻塞。
+- Node 18+：執行需要 Node 的選用 runner 時需要，例如 Archify。
+- npm 9+：只在使用者要求、target manifest/lockfile 支援且已授權安裝專案依賴時需要。
 - `codebase-onboarding`：隨 `repo-understanding` 內建，不需額外下載。
-- `archify`：產生驗證過的架構與流程圖；缺少時圖表 gate 為 blocked，不可偷偷下載。
+- `archify`：僅在圖表屬於使用者要求或驗收範圍時需要；其他情形標示 `NOT APPLICABLE`／`SKIP`。
+
+工具缺少時只影響需要它的 gate。只有該 gate 是接受條件且未完成，才將結果標為 `PARTIAL`／`BLOCKED`；不可因可選工具缺少而把整次 source-based 分析判為失敗。
 
 本清單以 `toolchain.json` 為準；若兩者不一致，AI 必須回報 manifest drift，不得自行猜測。
 
@@ -62,7 +67,9 @@ AI 必須先讀取該 Skill 的 `SKILL.md`，再依其中列出的 references、
 
 ## AI 最終回報格式
 
-每次執行至少回報：
+以下詳細格式適用於執行環境稽核、初始化、依賴修復，或使用外部工具／能力 gate 的任務。一般 Skill 工作依其 `SKILL.md` 與全域自訂指示回報實際修改、驗證及限制；若沒有外部依賴或 gate，不必建立空白狀態表。
+
+適用上述依賴流程時，至少回報：
 
 - 使用的 Skill 與版本
 - 依賴狀態表與檢查命令

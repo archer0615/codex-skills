@@ -1,0 +1,6 @@
+interface:
+  display_name: "Decision Researcher"
+  short_description: "Use when a decision needs criteria, evidence, alternatives, and a recommendat..."
+  default_prompt: "Use the decision-researcher skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

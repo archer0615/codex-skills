@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ai Governance"
+  short_description: "Use when establishing practical rules, risks, ownership, and review controls ..."
+  default_prompt: "Use the ai-governance skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

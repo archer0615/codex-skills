@@ -1,0 +1,6 @@
+interface:
+  display_name: "Closed Loop Task Solver"
+  short_description: "Use for substantial multi-phase tasks needing a bounded correction loop."
+  default_prompt: "Use the closed-loop-task-solver skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

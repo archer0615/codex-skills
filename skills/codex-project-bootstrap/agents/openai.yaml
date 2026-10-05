@@ -1,0 +1,6 @@
+interface:
+  display_name: "Codex Project Bootstrap"
+  short_description: "Use to initialize Codex guidance and capability links for a project."
+  default_prompt: "Use the codex-project-bootstrap skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

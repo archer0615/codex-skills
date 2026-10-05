@@ -1,0 +1,6 @@
+interface:
+  display_name: "Option Comparison"
+  short_description: "Use when comparing products, designs, vendors, or implementation choices agai..."
+  default_prompt: "Use the option-comparison skill when its specific task applies."
+policy:
+  allow_implicit_invocation: true

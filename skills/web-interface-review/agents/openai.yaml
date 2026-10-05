@@ -1,0 +1,6 @@
+interface:
+  display_name: "Web Interface Review"
+  short_description: "Review web interfaces for evidence-backed usability and accessibility issues."
+  default_prompt: "Use the web-interface-review skill for a focused web UI review."
+policy:
+  allow_implicit_invocation: true
